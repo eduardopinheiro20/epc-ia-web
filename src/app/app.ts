@@ -1,12 +1,26 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from "../components/navbar/navbar";
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  standalone: true,
+  imports: [RouterOutlet, NavbarComponent, CommonModule ],
+  templateUrl: './app.html'
 })
 export class App {
-  protected readonly title = signal('epc-ia-web');
+  modalVisible = false;
+  modalMessage = "";
+  modalIcon: "success" | "warning" | "error" = "success";
+
+  showModal(msg: string, icon: "success" | "warning" | "error" = "success") {
+    this.modalVisible = true;
+    this.modalMessage = msg;
+    this.modalIcon = icon;
+  }
+
+  closeModal() {
+    this.modalVisible = false;
+  }
 }

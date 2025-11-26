@@ -1,0 +1,47 @@
+.dashboard {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.title {
+  color: #2ce39b;
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.subtitle {
+  color: #cdd2d8;
+  font-size: 18px;
+  margin-top: 8px;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: rgba(15, 26, 43, 0.85);
+  backdrop-filter: blur(6px);
+  padding: 25px;
+  width: 300px;
+  border-radius: 12px;
+  border: 1px solid #0d1a2e;
+  color: #d5d8df;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.card:hover {
+  border-color: #2ce39b;
+  transform: translateY(-4px);
+}
+
+.card h2 {
+  color: #2ce39b;
+  font-size: 22px;
+  margin-bottom: 10px;
+}

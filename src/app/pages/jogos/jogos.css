@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: 1px solid #334155;       /* borda igual paginação */
+  background-color: #0f1a2b;       /* fundo igual página */
+  color: #cbd5e1;                  /* texto cinza claro */
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+
+.tab-btn:hover {
+  background-color: #16263c;
+}
+
+.tab-btn.active {
+  background-color: #059669;       /* verde do seu tema */
+  border-color: #059669;
+  color: white;
+}

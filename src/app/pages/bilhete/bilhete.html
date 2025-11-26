@@ -1,0 +1,115 @@
+<!-- LOADING -->
+<div *ngIf="loading" class="text-center text-gray-400 mt-20">
+  Carregando bilhete do dia...
+</div>
+
+<!-- TOAST -->
+<div 
+  *ngIf="toastMsg" 
+  class="fixed top-4 right-4 bg-gray-900 text-gray-200 
+         border border-gray-700 px-4 py-3 rounded-xl shadow-xl
+         animate-fade-in z-50">
+  {{ toastMsg }}
+</div>
+<!-- ALERTA SIMPLES -->
+<div *ngIf="modalVisible" class="
+    z-[9999]
+    bg-gray-900 text-gray-100
+    border border-gray-700
+    px-6 py-4 rounded-xl shadow-2xl
+">
+  <div class="flex items-center gap-3">
+    <span *ngIf="modalIcon === 'success'" class="text-emerald-400 text-3xl">✔</span>
+    <span *ngIf="modalIcon === 'warning'" class="text-yellow-400 text-3xl">⚠</span>
+    <span *ngIf="modalIcon === 'error'" class="text-red-400 text-3xl">✖</span>
+
+    <span class="font-semibold">
+      {{ modalMessage }}
+    </span>
+  </div>
+
+  <div class="text-center mt-3">
+    <button (click)="closeModal()"
+      class="px-5 py-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-lg">
+      OK
+    </button>
+  </div>
+</div>
+<!-- BILHETE -->
+<div *ngIf="!loading && ticket" 
+     class="max-w-2xl mx-auto mt-10 bg-gray-900 text-white rounded-2xl shadow-xl p-6 border border-gray-700">
+
+  <!-- Header -->
+  <div class="text-center mb-6">
+    <h1 class="text-2xl font-extrabold tracking-wide text-emerald-400">
+      MELHOR APOSTA DO DIA
+    </h1>
+    <p class="text-gray-400 mt-1 text-sm">
+      Bilhete seguro gerado pela IA
+    </p>
+  </div>
+
+  <!-- Odds totais -->
+  <div class="bg-gray-800 p-4 rounded-xl flex justify-between items-center mb-4 border border-gray-700">
+    <span class="font-semibold text-gray-300">
+      Múltipla de {{ ticket.selections.length }} seleções
+    </span>
+    <span class="text-emerald-400 font-bold text-xl">
+      {{ ticket.final_odd | number:'1.2-2' }}
+    </span>
+  </div>
+
+  <!-- Lista de seleções -->
+  <div class="space-y-4">
+
+    <div *ngFor="let sel of ticket.selections"
+         class="p-3 bg-gray-800 rounded-xl border border-gray-700">
+      
+      <div class="font-bold text-white text-lg">
+        {{ sel.market }}
+      </div>
+
+      <div class="text-gray-400 text-sm">
+        {{ sel.home }} vs {{ sel.away }}
+      </div>
+
+      <div class="text-gray-500 text-xs">
+        {{ sel.date | date:'dd/MM/yyyy HH:mm' }}
+      </div>
+
+      <div class="text-emerald-300 font-semibold text-right mt-2">
+        Odd: {{ sel.odd }}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recomendações -->
+  <div class="mt-6 p-4 bg-gray-800 rounded-xl border border-gray-700">
+    <p class="text-gray-300">
+      <span class="font-bold text-emerald-400">Recomendação:</span>
+      {{ ticket.system_recommendation }}
+    </p>
+
+    <p class="mt-2 text-gray-300">
+      <span class="font-bold text-emerald-400">Confiança:</span>
+      {{ ticket.confidence_formatted }}
+    </p>
+
+    <h3 class="font-bold mt-4 mb-1 text-emerald-400">Motivos:</h3>
+
+    <ul class="text-gray-400 text-sm list-disc ml-4 space-y-1">
+      <li *ngFor="let ex of ticket.explanation">{{ ex }}</li>
+    </ul>
+  </div>
+
+  <!-- Botão SALVAR -->
+  <div class="mt-6 flex justify-center">
+    <button 
+      (click)="salvarAposta()"
+      class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl shadow-lg transition">
+      [ SALVAR APOSTA ]
+    </button>
+  </div>
+
+</div>

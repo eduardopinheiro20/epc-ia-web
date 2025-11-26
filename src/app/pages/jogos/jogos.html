@@ -1,0 +1,170 @@
+<div class="mt-10 text-center">
+  <h1 class="text-3xl font-extrabold text-emerald-400">
+    {{ activeTab === 'futuros' ? 'Próximos Jogos' : 'Jogos Encerrados' }}
+  </h1>
+
+  <p class="text-gray-300 mt-2">
+    {{ activeTab === 'futuros'
+      ? 'Lista de jogos que ainda irão acontecer. Filtre por time, liga ou data.'
+      : 'Lista de jogos já finalizados. Filtre por time, liga ou data.' }}
+  </p>
+</div>
+
+<div class="flex justify-center mt-6 gap-4">
+
+  <!-- Aba Próximos -->
+  <button
+    (click)="setTab('futuros')"
+    class="px-6 py-2 rounded-lg border transition"
+    [ngClass]="{
+      'bg-emerald-600 border-emerald-600 text-white': activeTab === 'futuros',
+      'bg-[#1e293b] border-gray-600 text-gray-200 hover:bg-[#273449]': activeTab !== 'futuros'
+    }"
+  >
+    Próximos Jogos
+  </button>
+
+  <!-- Aba Encerrados -->
+  <button
+    (click)="setTab('encerrados')"
+    class="px-6 py-2 rounded-lg border transition"
+    [ngClass]="{
+      'bg-emerald-600 border-emerald-600 text-white': activeTab === 'encerrados',
+      'bg-[#1e293b] border-gray-600 text-gray-200 hover:bg-[#273449]': activeTab !== 'encerrados'
+    }"
+  >
+    Jogos Encerrados
+  </button>
+
+</div>
+
+<!-- FILTROS -->
+<div class="w-full max-w-7xl mx-auto mt-6 px-4">
+
+  <div class="bg-[#0f1a2b] p-4 rounded-xl border border-gray-700 flex flex-wrap gap-4 items-end">
+
+    <div class="flex flex-col">
+      <label class="text-gray-300 text-sm">Time (casa ou fora)</label>
+      <input type="text" [(ngModel)]="qTeam" (ngModelChange)="applyFilters()"
+             placeholder="Ex: Manchester" class="bg-[#142238] text-gray-200 p-2 rounded w-64" />
+    </div>
+
+    <div class="flex flex-col">
+      <label class="text-gray-300 text-sm">Liga</label>
+      <select [(ngModel)]="qLiga" (ngModelChange)="applyFilters()" class="bg-[#142238] text-gray-200 p-2 rounded">
+        <option value="">Todas</option>
+        <option *ngFor="let l of ligasList" [value]="l">{{ l }}</option>
+      </select>
+    </div>
+
+    <div class="flex flex-col">
+      <label class="text-gray-300 text-sm">Data início</label>
+      <input type="date" [(ngModel)]="startDate" (ngModelChange)="applyFilters()"
+             class="bg-[#142238] text-gray-200 p-2 rounded" />
+    </div>
+
+    <div class="flex flex-col">
+      <label class="text-gray-300 text-sm">Data fim</label>
+      <input type="date" [(ngModel)]="endDate" (ngModelChange)="applyFilters()"
+             class="bg-[#142238] text-gray-200 p-2 rounded" />
+    </div>
+
+    <div class="ml-auto">
+      <button (click)="limparFiltros()" class="bg-[#21303d] text-gray-200 px-4 py-2 rounded border border-gray-700">
+        Limpar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- TABELA -->
+<div class="max-w-7xl mx-auto mt-6 px-4" *ngIf="!loading">
+
+  <div class="bg-[#0f1a2b] rounded-xl p-0 shadow-lg border border-gray-700 overflow-hidden">
+    <table class="w-full text-gray-300">
+    <thead class="bg-[#142238] text-emerald-400">
+
+        <!-- COLUNAS PARA PRÓXIMOS JOGOS -->
+        <tr *ngIf="activeTab === 'futuros'">
+          <th class="py-3 px-4 text-left">Confronto</th>
+          <th class="py-3 px-4 text-left">Liga</th>
+          <th class="py-3 px-4 text-left">Data</th>
+          <th class="py-3 px-4 text-center">Ações</th>
+        </tr>
+
+        <!-- COLUNAS PARA JOGOS ENCERRADOS -->
+        <tr *ngIf="activeTab === 'encerrados'">
+          <th class="py-3 px-4 text-left">Confronto</th>
+          <th class="py-3 px-4 text-left">Liga</th>
+          <th class="py-3 px-4 text-left">Data</th>
+          <th class="py-3 px-4 text-center">Placar</th>
+        </tr>
+
+    </thead>
+
+      <tbody>
+        <tr *ngFor="let jogo of pageItems" class="border-b border-gray-800 hover:bg-[#0b1a27]">
+
+          <!-- CONFRONTO (ambas as abas) -->
+          <td class="py-3 px-4 font-semibold text-gray-100">
+            {{ jogo.home }} 
+            <span *ngIf="activeTab === 'encerrados'">
+              {{ jogo.home_goals }} 
+            </span>
+
+            x 
+
+            <span *ngIf="activeTab === 'encerrados'">
+              {{ jogo.away_goals }}
+            </span>
+            {{ jogo.away }}
+          </td>
+
+          <td class="py-3 px-4">{{ jogo.league }}</td>
+
+          <!-- DATA -->
+          <td class="py-3 px-4">
+            {{ jogo._dateObj ? (jogo._dateObj | date:'dd/MM/yyyy HH:mm') : '-' }}
+          </td>
+
+          <!-- Ações (apenas para próximos jogos) -->
+          <td *ngIf="activeTab === 'futuros'" class="py-3 px-4 text-center">
+            -
+          </td>
+
+          <!-- Placar já está incluído no Confronto, mas se quiser separadamente -->
+          <td *ngIf="activeTab === 'encerrados'" class="py-3 px-4 text-center font-bold">
+            {{ jogo.home_goals }} - {{ jogo.away_goals }}
+          </td>
+
+        </tr>
+
+        <tr *ngIf="pageItems.length === 0">
+          <td class="py-6 px-4 text-center text-gray-400" colspan="5">
+            Nenhum jogo encontrado.
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+  <!-- PAGINAÇÃO -->
+  <div class="flex justify-center items-center gap-4 mt-6">
+    <button (click)="anterior()" [disabled]="page === 1"
+            class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b] text-emerald-400 disabled:opacity-40">
+      ← Anterior
+    </button>
+
+    <span class="text-gray-300">Página {{ page }} de {{ pages }}</span>
+
+    <button (click)="proxima()" [disabled]="page === pages"
+            class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b] text-emerald-400 disabled:opacity-40">
+      Próxima →
+    </button>
+  </div>
+
+</div>
+
+<div *ngIf="loading" class="text-center text-gray-400 mt-8">Carregando jogos...</div>
