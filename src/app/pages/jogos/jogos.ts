@@ -26,6 +26,7 @@ export class JogosComponent implements OnInit {
   qLiga: string = '';
   startDate: string | null = null;
   endDate: string | null = null;
+  dateSort: 'asc' | 'desc' = 'asc';
 
   page = 1;
   size = 20;
@@ -124,10 +125,14 @@ export class JogosComponent implements OnInit {
     });
 
     this.filteredJogos.sort((a, b) => {
-      if (!a._dateObj) return 1;
-      if (!b._dateObj) return -1;
-      return a._dateObj.getTime() - b._dateObj.getTime();
+      const aTime = a._dateObj ? a._dateObj.getTime() : 0;
+      const bTime = b._dateObj ? b._dateObj.getTime() : 0;
+
+      return this.dateSort === 'asc'
+        ? aTime - bTime
+        : bTime - aTime;
     });
+
 
     this.pages = Math.max(1, Math.ceil(this.filteredJogos.length / this.size));
   }
@@ -172,4 +177,10 @@ export class JogosComponent implements OnInit {
     this.endDate = null;
     this.applyFilters();
   }
+
+  toggleDateSort() {
+    this.dateSort = this.dateSort === 'asc' ? 'desc' : 'asc';
+    this.applyFilters(); // reaproveita seu fluxo atual
+  }
+
 }

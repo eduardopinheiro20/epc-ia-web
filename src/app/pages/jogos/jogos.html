@@ -87,17 +87,31 @@
 
         <!-- COLUNAS PARA PRÓXIMOS JOGOS -->
         <tr *ngIf="activeTab === 'futuros'">
-          <th class="py-3 px-4 text-left">Confronto</th>
-          <th class="py-3 px-4 text-left">Liga</th>
-          <th class="py-3 px-4 text-left">Data</th>
+          <th class="py-3 px-4 text-center">Confronto</th>
+          <th class="py-3 px-4 text-center">Liga</th>
+          <th class="py-3 px-4 text-center cursor-pointer select-none hover:text-emerald-400 transition"
+            (click)="toggleDateSort()">
+            Data
+            <span class="inline-block ml-1">
+              <ng-container *ngIf="dateSort === 'asc'">▲</ng-container>
+              <ng-container *ngIf="dateSort === 'desc'">▼</ng-container>
+            </span>
+          </th>
           <th class="py-3 px-4 text-center">Ações</th>
         </tr>
 
         <!-- COLUNAS PARA JOGOS ENCERRADOS -->
         <tr *ngIf="activeTab === 'encerrados'">
-          <th class="py-3 px-4 text-left">Confronto</th>
-          <th class="py-3 px-4 text-left">Liga</th>
-          <th class="py-3 px-4 text-left">Data</th>
+          <th class="py-3 px-4 text-center">Confronto</th>
+          <th class="py-3 px-4 text-center">Liga</th>
+          <th class="py-3 px-4 text-center cursor-pointer select-none"
+           (click)="toggleDateSort()">
+            Data
+            <span class="inline-block ml-1">
+              <ng-container *ngIf="dateSort === 'asc'">▲</ng-container>
+              <ng-container *ngIf="dateSort === 'desc'">▼</ng-container>
+            </span>
+          </th>
           <th class="py-3 px-4 text-center">Placar</th>
         </tr>
 
@@ -107,7 +121,7 @@
         <tr *ngFor="let jogo of pageItems" class="border-b border-gray-800 hover:bg-[#0b1a27]">
 
           <!-- CONFRONTO (ambas as abas) -->
-          <td class="py-3 px-4 font-semibold text-gray-100">
+          <td class="py-3 px-4 font-semibold text-center text-gray-100">
             {{ jogo.home }} 
             <span *ngIf="activeTab === 'encerrados'">
               {{ jogo.home_goals }} 
@@ -121,10 +135,10 @@
             {{ jogo.away }}
           </td>
 
-          <td class="py-3 px-4">{{ jogo.league }}</td>
+          <td class="py-3 px-4 text-center">{{ jogo.league }}</td>
 
           <!-- DATA -->
-          <td class="py-3 px-4">
+          <td class="py-3 px-4 text-center">
             {{ jogo._dateObj ? (jogo._dateObj | date:'dd/MM/yyyy HH:mm') : '-' }}
           </td>
 
