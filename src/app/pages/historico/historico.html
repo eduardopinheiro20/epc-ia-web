@@ -40,27 +40,42 @@
         <thead class="bg-[#142238] text-emerald-400">
             <tr>
                 <th class="py-3 px-4 text-left">Data</th>
-                <th class="py-3 px-4 text-left">ID</th>
                 <th class="py-3 px-4 text-left">Odd Final</th>
-                <th class="py-3 px-4 text-left">Confiança</th>
-                <th class="py-3 px-4 text-center">Ações</th>
+                <th class="py-3 px-4 text-left">%</th>
+                <th class="py-3 px-4 text-left">Status</th>
+                <th class="py-3 px-4 text-center">Visualizar Bilhete</th>
             </tr>
         </thead>
 
         <tbody>
             <tr *ngFor="let item of items" class="border-b border-gray-700">
                 <td class="py-3 px-4">
-                    {{ item.created_at | date:'dd/MM/yyyy HH:mm' }}
+                    {{ item.saved_at | date:'dd/MM/yyyy HH:mm' }}
                 </td>
 
-                <td class="py-3 px-4">{{ item.id }}</td>
-
                 <td class="py-3 px-4 text-emerald-400 font-semibold">
-                    {{ item.combined_odd }}
+                    {{ item.final_odd }}
                 </td>
 
                 <td class="py-3 px-4 text-emerald-400 font-semibold">
                     {{ item.combined_prob * 100 | number:'1.0-1' }}%
+                </td>
+
+                <td class="py-3 px-4 font-semibold"
+                    [ngStyle]="{
+                      color:
+                        item.status === 'PENDING' ? '#facc15' : 
+                        item.result === 'GREEN' ? '#34d399' :
+                        item.result === 'RED' ? '#f87171' : 
+                        '#d1d5db'
+                    }">
+
+                    {{
+                        item.status === 'PENDING' ? 'Pendente' :
+                        item.result === 'GREEN' ? 'Green' :
+                        item.result === 'RED' ? 'Red' :
+                        'Indefinido'
+                    }}
                 </td>
 
                 <td class="py-3 px-4 text-center">

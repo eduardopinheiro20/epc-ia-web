@@ -106,7 +106,8 @@
   <!-- Botão SALVAR -->
   <div class="mt-6 flex justify-center">
     <button 
-      (click)="salvarAposta()"
+      (click)="salvarBilhete()"
+      [disabled]="saving"
       class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl shadow-lg transition">
       [ SALVAR APOSTA ]
     </button>
