@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+input, select {
+  outline: none;
+}
+
+table th, table td {
+  font-size: 14px;
+}
+
+tr:hover {
+  transition: 0.2s;
+}

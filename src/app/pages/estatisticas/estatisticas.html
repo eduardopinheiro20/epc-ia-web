@@ -1,0 +1,149 @@
+<div class="mt-10 text-center">
+  <h1 class="text-3xl font-extrabold text-emerald-400">
+    Estatísticas das Partidas
+  </h1>
+
+  <p class="text-gray-300 mt-2">
+    Compare estatísticas detalhadas de cada confronto.
+  </p>
+</div>
+
+<!-- FILTROS -->
+<div class="w-full max-w-7xl mx-auto mt-6 px-4">
+
+  <div class="bg-[#0f1a2b] p-4 rounded-xl border border-gray-700 flex flex-wrap gap-4 items-end">
+
+    <!-- Time -->
+    <div class="flex flex-col">
+      <label class="text-gray-300 text-sm">Time</label>
+      <input type="text" [(ngModel)]="qTeam" (ngModelChange)="applyFilters()"
+             placeholder="Ex: Chelsea" class="bg-[#142238] text-gray-200 p-2 rounded w-64" />
+    </div>
+
+    <!-- Liga -->
+    <div class="flex flex-col">
+      <label class="text-gray-300 text-sm">Liga</label>
+      <select [(ngModel)]="qLiga" (ngModelChange)="applyFilters()" class="bg-[#142238] text-gray-200 p-2 rounded">
+        <option value="">Todas</option>
+        <option *ngFor="let l of ligas" [value]="l">{{ l }}</option>
+      </select>
+    </div>
+    <div class="flex flex-col">
+        <label class="text-gray-300 text-sm">Data início</label>
+        <input type="date" [(ngModel)]="startDate" (ngModelChange)="applyFilters()"
+                class="bg-[#142238] text-gray-200 p-2 rounded" />
+        </div>
+
+    <div class="flex flex-col">
+        <label class="text-gray-300 text-sm">Data fim</label>
+        <input type="date" [(ngModel)]="endDate" (ngModelChange)="applyFilters()"
+                class="bg-[#142238] text-gray-200 p-2 rounded" />
+    </div>
+
+    <div class="ml-auto">
+      <button (click)="resetFilters()" class="bg-[#21303d] text-gray-200 px-4 py-2 rounded border border-gray-700">
+        Limpar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- TABELA -->
+<div class="max-w-7xl mx-auto mt-6 px-4" *ngIf="!loading">
+
+  <div class="bg-[#0f1a2b] rounded-xl p-0 shadow-lg border border-gray-700 overflow-hidden">
+    <table class="w-full text-gray-300">
+      <thead class="bg-[#142238] text-emerald-400">
+        <tr>
+          <th class="py-3 px-4 text-center">Confronto</th>
+          <th class="py-3 px-4 text-center">Chutes</th>
+          <th class="py-3 px-4 text-center">Chutes no Gol</th>
+          <th class="py-3 px-4 text-center">Posse (%)</th>
+          <th class="py-3 px-4 text-center">Escanteios</th>
+          <th class="py-3 px-4 text-center">Cartões</th>
+          <th class="py-3 px-4 text-center cursor-pointer select-none"
+                (click)="toggleDateSort()">
+            Data
+            <span class="inline-block ml-1">
+                <ng-container *ngIf="dateSort === 'asc'">▲</ng-container>
+                <ng-container *ngIf="dateSort === 'desc'">▼</ng-container>
+                <ng-container *ngIf="dateSort === null">⇅</ng-container>
+            </span>
+          </th>
+          <th class="py-3 px-4 text-center">Liga</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let g of pageItems" class="border-b border-gray-800 hover:bg-[#0b1a27]">
+
+          <td class="py-3 px-4 font-semibold text-center text-gray-100">
+            {{ g.home.teamName }} x {{ g.away.teamName }}
+          </td>
+
+          <td class="py-3 px-4 text-center">
+            {{ g.home.stats?.shotsTotal || 0 }} - {{ g.away.stats?.shotsTotal || 0 }}
+          </td>
+
+          <td class="py-3 px-4 text-center">
+            {{ g.home.stats?.shotsOnGoal || 0 }} - {{ g.away.stats?.shotsOnGoal || 0 }}
+          </td>
+
+          <td class="py-3 px-4 text-center">
+            {{ g.home.stats?.possession || 0 }}% - {{ g.away.stats?.possession || 0 }}%
+          </td>
+
+          <td class="py-3 px-4 text-center">
+            {{ g.home.stats?.corners || 0 }} - {{ g.away.stats?.corners || 0 }}
+          </td>
+
+          <td class="py-3 px-4 text-center">
+            {{ g.home.stats?.yellowCards || 0 }}
+            /
+            {{ g.home.stats?.redCards || 0 }}
+            -
+            {{ g.away.stats?.yellowCards || 0 }}
+            /
+            {{ g.away.stats?.redCards || 0 }}
+          </td>
+
+          <td class="py-3 px-4 text-center">
+            {{ g.date | date:'dd/MM/yyyy HH:mm' }}
+          </td>
+
+
+          <td class="py-3 px-4 text-center">{{ g.league }}</td>
+
+        </tr>
+
+        <tr *ngIf="pageItems.length === 0">
+          <td colspan="7" class="py-6 px-4 text-center text-gray-400">
+            Nenhuma estatística encontrada.
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGINAÇÃO -->
+  <div class="flex justify-center items-center gap-4 mt-6">
+    <button (click)="prevPage()" [disabled]="page === 1"
+            class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b] text-emerald-400 disabled:opacity-40">
+      ← Anterior
+    </button>
+
+    <span class="text-gray-300">Página {{ page }} de {{ pages }}</span>
+
+    <button (click)="nextPage()" [disabled]="page === pages"
+            class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b] text-emerald-400 disabled:opacity-40">
+      Próxima →
+    </button>
+  </div>
+
+</div>
+
+<div *ngIf="loading" class="text-center text-gray-400 mt-8">
+  Carregando estatísticas...
+</div>

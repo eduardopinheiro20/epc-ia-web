@@ -33,6 +33,6 @@ export class BankrollService {
   }
 
   validarAutomatico(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/validar`);
+    return this.http.post(`${this.baseUrl}/validar`, {});
   }
 }

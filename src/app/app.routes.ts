@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { BilheteComponent } from './pages/bilhete/bilhete';
 import { HistoricoComponent } from './pages/historico/historico';
+import { EstatisticasComponent } from './pages/estatisticas/estatisticas';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'bilhete', pathMatch: 'full' },
@@ -23,5 +24,12 @@ export const routes: Routes = [
   path: 'jogos',
     loadComponent: () =>
       import('./pages/jogos/jogos').then(m => m.JogosComponent)
+  },
+  {
+    path: 'estatisticas',
+    loadComponent: () =>
+      import('./pages/estatisticas/estatisticas')
+        .then(m => m.EstatisticasComponent)
   }
+
 ];

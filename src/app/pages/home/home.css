@@ -59,7 +59,7 @@
   background: rgba(15, 26, 43, 0.85);
   border-radius: 12px;
   padding: 20px 30px;
-  width: 380px;
+  width: 500px;
   text-align: center;
   color: #d5d8df;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
@@ -98,12 +98,6 @@
   font-weight: 700;
   color: #2bff88; /* VERDE BRILHANTE */
   margin-top: 2px;
-}
-
-.status {
-  margin: 10px 0 20px;
-  font-size: 13px;
-  opacity: 0.8;
 }
 
 button {
