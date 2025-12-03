@@ -70,9 +70,8 @@ export class BilheteComponent implements OnInit {
           return;
         }
 
-        // 2️⃣ Se banca existe → continua fluxo normal
+        // 2️⃣ Se banca existe → salvar normal
         this.salvarBilheteComBanca();
-
       },
       error: () => {
         this.showModal("❌ Erro ao verificar banca.", "error");
@@ -84,40 +83,14 @@ export class BilheteComponent implements OnInit {
     this.saving = true;
 
     this.iaService.salvarBilhete(this.ticket).subscribe({
-      next: (res: SaveResult) => {
+      next: (res: any) => {
 
-        const ticketId = res.ticket_id;
+        this.saving = false;
 
-        if (!ticketId) {
-          this.saving = false;
-          this.showModal("❌ Erro: ticket salvo mas sem ID retornado.");
-          return;
-        }
+        // O backend já salvou e aplicou automaticamente!
+        this.showModal("✅ Bilhete salvo e aplicado na banca!");
 
-        // 1️⃣ vincula
-        this.bankrollService.linkTicket(ticketId).subscribe({
-          next: () => {
-
-            // 2️⃣ aplica na banca
-            this.bankrollService.applyTicket(ticketId).subscribe({
-              next: () => {
-                this.saving = false;
-                this.showModal("✅ Bilhete salvo e aplicado na banca!");
-              },
-              error: () => {
-                this.saving = false;
-                this.showModal("⚠️ Salvo, mas falhou ao aplicar na banca.");
-              }
-            });
-
-          },
-          error: () => {
-            this.saving = false;
-            this.showModal("❌ Bilhete salvo, mas falhou ao vincular à banca.");
-          }
-        });
       },
-
       error: () => {
         this.saving = false;
         this.showModal("❌ Erro ao salvar aposta.");

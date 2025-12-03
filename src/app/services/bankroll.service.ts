@@ -24,10 +24,6 @@ export class BankrollService {
     return this.http.post(`${this.baseUrl}/link-ticket`, { ticket_id });
   }
 
-  applyTicket(ticket_id: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/apply-ticket`, { ticket_id });
-  }
-
   resetBankroll(): Observable<any> {
     return this.http.post(`${this.baseUrl}/reset`, {});
   }
