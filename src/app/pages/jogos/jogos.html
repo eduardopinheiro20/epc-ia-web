@@ -1,3 +1,4 @@
+<!-- jogos.html -->
 <div class="mt-10 text-center">
   <h1 class="text-3xl font-extrabold text-emerald-400">
     {{ activeTab === 'futuros' ? 'Próximos Jogos' : 'Jogos Encerrados' }}
@@ -11,8 +12,6 @@
 </div>
 
 <div class="flex justify-center mt-6 gap-4">
-
-  <!-- Aba Próximos -->
   <button
     (click)="setTab('futuros')"
     class="px-6 py-2 rounded-lg border transition"
@@ -24,7 +23,6 @@
     Próximos Jogos
   </button>
 
-  <!-- Aba Encerrados -->
   <button
     (click)="setTab('encerrados')"
     class="px-6 py-2 rounded-lg border transition"
@@ -35,12 +33,10 @@
   >
     Jogos Encerrados
   </button>
-
 </div>
 
 <!-- FILTROS -->
 <div class="w-full max-w-7xl mx-auto mt-6 px-4">
-
   <div class="bg-[#0f1a2b] p-4 rounded-xl border border-gray-700 flex flex-wrap gap-4 items-end">
 
     <div class="flex flex-col">
@@ -69,116 +65,116 @@
              class="bg-[#142238] text-gray-200 p-2 rounded" />
     </div>
 
-    <div class="ml-auto">
+    <div class="ml-auto flex items-center gap-2">
       <button (click)="limparFiltros()" class="bg-[#21303d] text-gray-200 px-4 py-2 rounded border border-gray-700">
         Limpar
       </button>
+      <button (click)="toggleDateSort()" class="bg-[#21303d] text-gray-200 px-3 py-2 rounded border border-gray-700">
+        Ordem: {{ dateSort === 'asc' ? '▲' : '▼' }}
+      </button>
     </div>
-
   </div>
 </div>
 
-<!-- TABELA -->
+<!-- TABELA / FUTUROS -->
 <div class="max-w-7xl mx-auto mt-6 px-4" *ngIf="!loading">
-
   <div class="bg-[#0f1a2b] rounded-xl p-0 shadow-lg border border-gray-700 overflow-hidden">
     <table class="w-full text-gray-300">
-    <thead class="bg-[#142238] text-emerald-400">
-
-        <!-- COLUNAS PARA PRÓXIMOS JOGOS -->
-        <tr *ngIf="activeTab === 'futuros'">
+      <thead class="bg-[#142238] text-emerald-400" *ngIf="activeTab === 'futuros'">
+        <tr>
           <th class="py-3 px-4 text-center">Confronto</th>
           <th class="py-3 px-4 text-center">Liga</th>
-          <th class="py-3 px-4 text-center cursor-pointer select-none hover:text-emerald-400 transition"
-            (click)="toggleDateSort()">
-            Data
-            <span class="inline-block ml-1">
-              <ng-container *ngIf="dateSort === 'asc'">▲</ng-container>
-              <ng-container *ngIf="dateSort === 'desc'">▼</ng-container>
-            </span>
-          </th>
+          <th class="py-3 px-4 text-center cursor-pointer select-none" (click)="toggleDateSort()">Data</th>
           <th class="py-3 px-4 text-center">Ações</th>
         </tr>
+      </thead>
 
-        <!-- COLUNAS PARA JOGOS ENCERRADOS -->
-        <tr *ngIf="activeTab === 'encerrados'">
-          <th class="py-3 px-4 text-center">Confronto</th>
-          <th class="py-3 px-4 text-center">Liga</th>
-          <th class="py-3 px-4 text-center cursor-pointer select-none"
-           (click)="toggleDateSort()">
-            Data
-            <span class="inline-block ml-1">
-              <ng-container *ngIf="dateSort === 'asc'">▲</ng-container>
-              <ng-container *ngIf="dateSort === 'desc'">▼</ng-container>
-            </span>
-          </th>
-          <th class="py-3 px-4 text-center">Placar</th>
-        </tr>
-
-    </thead>
-
-      <tbody>
-        <tr *ngFor="let jogo of pageItems" class="border-b border-gray-800 hover:bg-[#0b1a27]">
-
-          <!-- CONFRONTO (ambas as abas) -->
+      <tbody *ngIf="activeTab === 'futuros'">
+        <tr *ngFor="let jogo of pageItemsFuturos" class="border-b border-gray-800 hover:bg-[#0b1a27]">
           <td class="py-3 px-4 font-semibold text-center text-gray-100">
-            {{ jogo.home }} 
-            <span *ngIf="activeTab === 'encerrados'">
-              {{ jogo.home_goals }} 
-            </span>
-
-            x 
-
-            <span *ngIf="activeTab === 'encerrados'">
-              {{ jogo.away_goals }}
-            </span>
-            {{ jogo.away }}
+            {{ jogo.home }} x {{ jogo.away }}
           </td>
-
           <td class="py-3 px-4 text-center">{{ jogo.league }}</td>
-
-          <!-- DATA -->
           <td class="py-3 px-4 text-center">
             {{ jogo._dateObj ? (jogo._dateObj | date:'dd/MM/yyyy HH:mm') : '-' }}
           </td>
-
-          <!-- Ações (apenas para próximos jogos) -->
-          <td *ngIf="activeTab === 'futuros'" class="py-3 px-4 text-center">
+          <td class="py-3 px-4 text-center">
+            <!-- Aqui você pode inserir botões de ação (ex: abrir popup, gerar bilhete) -->
             -
           </td>
-
-          <!-- Placar já está incluído no Confronto, mas se quiser separadamente -->
-          <td *ngIf="activeTab === 'encerrados'" class="py-3 px-4 text-center font-bold">
-            {{ jogo.home_goals }} - {{ jogo.away_goals }}
-          </td>
-
         </tr>
 
-        <tr *ngIf="pageItems.length === 0">
-          <td class="py-6 px-4 text-center text-gray-400" colspan="5">
-            Nenhum jogo encontrado.
-          </td>
+        <tr *ngIf="pageItemsFuturos.length === 0">
+          <td class="py-6 px-4 text-center text-gray-400" colspan="4">Nenhum jogo encontrado.</td>
         </tr>
       </tbody>
-
     </table>
   </div>
 
-  <!-- PAGINAÇÃO -->
-  <div class="flex justify-center items-center gap-4 mt-6">
-    <button (click)="anterior()" [disabled]="page === 1"
+  <!-- PAGINAÇÃO FUTUROS -->
+  <div *ngIf="activeTab === 'futuros'" class="flex justify-center items-center gap-4 mt-6">
+    <button (click)="anteriorFut()" [disabled]="page === 1"
             class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b] text-emerald-400 disabled:opacity-40">
       ← Anterior
     </button>
 
     <span class="text-gray-300">Página {{ page }} de {{ pages }}</span>
 
-    <button (click)="proxima()" [disabled]="page === pages"
+    <button (click)="proximaFut()" [disabled]="page === pages"
             class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b] text-emerald-400 disabled:opacity-40">
       Próxima →
     </button>
   </div>
+</div>
 
+<!-- TABELA / ENCERRADOS -->
+<div class="max-w-7xl mx-auto mt-6 px-4" *ngIf="!loading && activeTab === 'encerrados'">
+  <div class="bg-[#0f1a2b] rounded-xl p-0 shadow-lg border border-gray-700 overflow-hidden">
+    <table class="w-full text-gray-300">
+      <thead class="bg-[#142238] text-emerald-400">
+        <tr>
+          <th class="py-3 px-4 text-center">Confronto</th>
+          <th class="py-3 px-4 text-center">Liga</th>
+          <th class="py-3 px-4 text-center cursor-pointer select-none" (click)="toggleDateSort()">Data</th>
+          <th class="py-3 px-4 text-center">Placar</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let jogo of encerrados" class="border-b border-gray-800 hover:bg-[#0b1a27]">
+          <td class="py-3 px-4 font-semibold text-center text-gray-100">
+            {{ jogo.home }} x {{ jogo.away }}
+          </td>
+          <td class="py-3 px-4 text-center">{{ jogo.league }}</td>
+          <td class="py-3 px-4 text-center">
+            {{ jogo.date ? (jogo.date | date:'dd/MM/yyyy HH:mm') : '-' }}
+          </td>
+          <td class="py-3 px-4 text-center font-bold">
+            {{ jogo.home_goals }} - {{ jogo.away_goals }}
+          </td>
+        </tr>
+
+        <tr *ngIf="encerrados.length === 0">
+          <td class="py-6 px-4 text-center text-gray-400" colspan="4">Nenhum jogo encontrado.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGINAÇÃO ENCERRADOS (BACKEND) -->
+  <div class="flex justify-center items-center gap-4 mt-6">
+    <button (click)="anteriorEnc()" [disabled]="encerradosPage === 1"
+            class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b] text-emerald-400 disabled:opacity-40">
+      ← Anterior
+    </button>
+
+    <span class="text-gray-300">Página {{ encerradosPage }} de {{ encerradosPages }}</span>
+
+    <button (click)="proximaEnc()" [disabled]="encerradosPage === encerradosPages"
+            class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b] text-emerald-400 disabled:opacity-40">
+      Próxima →
+    </button>
+  </div>
 </div>
 
 <div *ngIf="loading" class="text-center text-gray-400 mt-8">Carregando jogos...</div>

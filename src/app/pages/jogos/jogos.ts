@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IaService } from '../../services/ia.service';
-import { ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { IaService } from '../../services/ia.service';
 
 @Component({
   selector: 'app-jogos',
@@ -17,20 +16,28 @@ export class JogosComponent implements OnInit {
 
   activeTab: 'futuros' | 'encerrados' = 'futuros';
 
-  allJogos: any[] = [];
-  filteredJogos: any[] = [];
+  // ---- FUTUROS ----
+  allFuturos: any[] = [];
+  futurosFiltrados: any[] = [];
 
-  ligasList: string[] = [];
+  // ---- ENCERRADOS ----
+  encerrados: any[] = [];
+  encerradosPage = 1;
+  encerradosPages = 1;
 
-  qTeam: string = '';
-  qLiga: string = '';
+  // ---- FILTROS ----
+  qTeam = '';
+  qLiga = '';
   startDate: string | null = null;
   endDate: string | null = null;
   dateSort: 'asc' | 'desc' = 'asc';
 
+  // ---- PAGINAÇÃO DO FRONT PARA FUTUROS ----
   page = 1;
   size = 20;
   pages = 1;
+
+  ligasList: string[] = [];
 
   constructor(
     private ia: IaService,
@@ -38,136 +45,142 @@ export class JogosComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.load();
+    this.loadFuturos();
   }
 
+  // ============================================================
+  // 🔹 TROCA DE ABA
+  // ============================================================
   setTab(tab: 'futuros' | 'encerrados') {
     this.activeTab = tab;
-    this.page = 1;
-    this.load();
+
+    if (tab === 'futuros') {
+      this.loadFuturos();
+    } else {
+      this.loadEncerrados();
+    }
   }
 
-  load() {
+  // ============================================================
+  // 🔹 FUTUROS — Backend SEM paginação (local no front)
+  // ============================================================
+  loadFuturos() {
     this.loading = true;
 
-    const req =
-      this.activeTab === 'futuros'
-        ? this.ia.getJogosFuturos()
-        : this.ia.getJogosEncerrados(
-            this.startDate ? `${this.startDate}T00:00:00` : undefined,
-            this.endDate ? `${this.endDate}T23:59:59` : undefined
-          );
-
-    req.subscribe({
+    this.ia.getJogosFuturos().subscribe({
       next: (res: any) => {
-        this.allJogos = (res.items || res) || [];
+        this.allFuturos = res.items || [];
 
-        this.allJogos.forEach(j => j._dateObj = j.date ? new Date(j.date) : null);
+        this.allFuturos.forEach(j => j._dateObj = new Date(j.date));
 
-        const set = new Set<string>();
-        this.allJogos.forEach(j => set.add(j.league ?? 'Outras Ligas'));
-        this.ligasList = Array.from(set);
+        this.ligasList = [...new Set(this.allFuturos.map(j => j.league || 'Outras Ligas'))];
 
-        this.applyFiltersLocal();
+        this.applyFiltroFuturos();
         this.loading = false;
         this.cdr.detectChanges();
       },
-      error: err => {
-        console.error('Erro ao carregar jogos', err);
-        this.loading = false;
-        this.cdr.detectChanges();
-      }
+      error: (_) => { this.loading = false; }
     });
   }
 
-  // CHAMA O BACKEND SOMENTE NA ABA "encerrados"
-  reloadBackendEncerrados() {
-    if (this.activeTab !== 'encerrados') return;
+  applyFiltroFuturos() {
+    const qt = this.qTeam.toLowerCase();
+    const ql = this.qLiga.toLowerCase();
 
-    this.loading = true;
-
-    this.ia.getJogosEncerrados(
-      this.startDate ? `${this.startDate}T00:00:00` : undefined,
-      this.endDate ? `${this.endDate}T23:59:59` : undefined
-    ).subscribe({
-      next: (res: any) => {
-        this.allJogos = res.items || [];
-        this.allJogos.forEach(j => j._dateObj = j.date ? new Date(j.date) : null);
-
-        const set = new Set<string>();
-        this.allJogos.forEach(j => set.add(j.league ?? 'Outras Ligas'));
-        this.ligasList = Array.from(set);
-
-        this.applyFiltersLocal();
-        this.loading = false;
-      }
-    });
-  }
-
-  // FILTRO PARA QUANDO JÁ TEMOS OS DADOS
-  applyFiltersLocal() {
-    const qTeam = (this.qTeam || '').toLowerCase();
-    const qLiga = (this.qLiga || '').toLowerCase();
-
-    this.filteredJogos = this.allJogos.filter(j => {
-      if (qTeam) {
-        const home = (j.home || '').toLowerCase();
-        const away = (j.away || '').toLowerCase();
-        if (!home.includes(qTeam) && !away.includes(qTeam)) return false;
-      }
-
-      if (qLiga) {
-        const liga = (j.league || '').toLowerCase();
-        if (!liga.includes(qLiga)) return false;
-      }
-
+    this.futurosFiltrados = this.allFuturos.filter(j => {
+      if (qt && !j.home.toLowerCase().includes(qt) && !j.away.toLowerCase().includes(qt)) return false;
+      if (ql && !(j.league || '').toLowerCase().includes(ql)) return false;
       return true;
     });
 
-    this.filteredJogos.sort((a, b) => {
-      const aTime = a._dateObj ? a._dateObj.getTime() : 0;
-      const bTime = b._dateObj ? b._dateObj.getTime() : 0;
-
+    this.futurosFiltrados.sort((a, b) => {
       return this.dateSort === 'asc'
-        ? aTime - bTime
-        : bTime - aTime;
+        ? a._dateObj - b._dateObj
+        : b._dateObj - a._dateObj;
     });
 
+    this.pages = Math.max(1, Math.ceil(this.futurosFiltrados.length / this.size));
 
-    this.pages = Math.max(1, Math.ceil(this.filteredJogos.length / this.size));
+    this.cdr.detectChanges();
   }
 
-  // ESTA FUNÇÃO DECIDE O QUE FAZER DEPENDENDO DA ABA
+  // ============================================================
+  // 🔹 ENCERRADOS — Backend COM paginação
+  // ============================================================
+loadEncerrados() {
+  this.loading = true;
+
+  const params: any = {
+    page: this.encerradosPage,
+    size: this.size,
+    sort: this.dateSort
+  };
+
+  // Só envia se tiver valor real
+  if (this.qTeam && this.qTeam.trim() !== '') {
+    params.team = this.qTeam.trim();
+  }
+
+  if (this.qLiga && this.qLiga.trim() !== '') {
+    params.league = this.qLiga.trim();
+  }
+
+  if (this.startDate) {
+    params.start = this.startDate + "T00:00:00";
+  }
+
+  if (this.endDate) {
+    params.end = this.endDate + "T23:59:59";
+  }
+
+  this.ia.getJogosEncerrados(params).subscribe({
+    next: (res: any) => {
+      this.encerrados = res.items || [];
+      this.encerradosPages = res.pages || 1;
+      this.loading = false;
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      console.error("Erro ao carregar encerrados:", err);
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
+  });
+}
+
+
+  // ============================================================
+  // 🔹 NAVEGAÇÃO DE PÁGINAS (ENCERRADOS)
+  // ============================================================
+  anteriorEnc() {
+    if (this.encerradosPage > 1) {
+      this.encerradosPage--;
+      this.loadEncerrados();
+    }
+  }
+
+  proximaEnc() {
+    if (this.encerradosPage < this.encerradosPages) {
+      this.encerradosPage++;
+      this.loadEncerrados();
+    }
+  }
+
+  // ============================================================
+  // 🔹 FUNÇÃO GERAL DE FILTRAGEM
+  // ============================================================
   applyFilters() {
-    // Se for aba FUTUROS → sempre local
     if (this.activeTab === 'futuros') {
-      this.applyFiltersLocal();
-      return;
-    }
-
-    // Se for aba ENCERRADOS → somente data chama backend
-    const changedDateFilter =
-      (this.startDate !== null && this.startDate !== '') ||
-      (this.endDate !== null && this.endDate !== '');
-
-    if (changedDateFilter) {
-      this.reloadBackendEncerrados();
+      this.applyFiltroFuturos();
     } else {
-      this.applyFiltersLocal();
+      this.encerradosPage = 1;
+      this.loadEncerrados();
     }
   }
 
-  get pageItems() {
-    const start = (this.page - 1) * this.size;
-    return this.filteredJogos.slice(start, start + this.size);
-  }
-
-  anterior() {
-    if (this.page > 1) this.page--;
-  }
-
-  proxima() {
-    if (this.page < this.pages) this.page++;
+  toggleDateSort() {
+    this.dateSort = this.dateSort === 'asc' ? 'desc' : 'asc';
+    this.applyFilters();
   }
 
   limparFiltros() {
@@ -178,9 +191,25 @@ export class JogosComponent implements OnInit {
     this.applyFilters();
   }
 
-  toggleDateSort() {
-    this.dateSort = this.dateSort === 'asc' ? 'desc' : 'asc';
-    this.applyFilters(); // reaproveita seu fluxo atual
+  // ============================================================
+  // PAGINAÇÃO LOCAL (FUTUROS)
+  // ============================================================
+  get pageItemsFuturos() {
+    const ini = (this.page - 1) * this.size;
+    return this.futurosFiltrados.slice(ini, ini + this.size);
   }
 
+  anteriorFut() {
+    if (this.page > 1) {
+      this.page--;
+      this.applyFiltroFuturos();
+    }
+  }
+
+  proximaFut() {
+    if (this.page < this.pages) {
+      this.page++;
+      this.applyFiltroFuturos();
+    }
+  }
 }

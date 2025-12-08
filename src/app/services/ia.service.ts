@@ -35,13 +35,9 @@ export class IaService {
     return this.http.get(`${this.api}/jogos-futuros`);
   }
 
-  getJogosEncerrados(start?: string, end?: string) {
-    const params: any = {};
-
-    if (start) params.start = start;
-    if (end) params.end = end;
-
-    return this.http.get<any>(`${this.api}/jogos-historicos`, { params });
+  getJogosEncerrados(filters: any) {
+    return this.http.get(`${this.api}/jogos-historicos`, { params: filters });
   }
+
 
 }

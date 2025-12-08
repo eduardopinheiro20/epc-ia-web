@@ -56,6 +56,11 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "host": "0.0.0.0",
+            "allowedHosts": ["all"],
+            "port": 4200
+          },
           "configurations": {
             "production": {
               "buildTarget": "epc-ia-web:build:production"
