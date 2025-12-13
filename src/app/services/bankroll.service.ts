@@ -31,4 +31,12 @@ export class BankrollService {
   validarAutomatico(): Observable<any> {
     return this.http.post(`${this.baseUrl}/validar`, {});
   }
+
+  cashout(finalValue: number) {
+    return this.http.post(`${this.baseUrl}/cashout`, {
+      finalValue
+    });
+  }
+
+
 }

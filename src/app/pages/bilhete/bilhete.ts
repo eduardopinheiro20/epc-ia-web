@@ -21,13 +21,12 @@ export class BilheteComponent implements OnInit {
 
   loading = true;
   ticket: any = null;
-  modalVisible = false;
+  toastVisible = false;
   saving = false;
-  modalMessage = "";
-  modalIcon: "success" | "warning" | "error" = "success";
-
-  toastMsg: string | null = null;   
-
+  toastMessage = "";
+  toastType: "success" | "warning" | "error" = "success";
+  private toastTimeout: any;
+  
   constructor(
     private iaService: IaService,
     private cdr: ChangeDetectorRef,
@@ -48,68 +47,97 @@ export class BilheteComponent implements OnInit {
     });
   }
 
-  showToast(msg: string) {
-    this.toastMsg = msg;
-    setTimeout(() => {
-      this.toastMsg = null;
-      this.cdr.detectChanges();
-    }, 3000);
-  }
-
   salvarBilhete() {
-
     if (this.saving) return;
 
-    // 1️⃣ verificar se existe banca antes de salvar
+    this.saving = true;
+
+    // verificar se existe banca antes de salvar
     this.bankrollService.getBankroll().subscribe({
       next: (res: any) => {
         const banca = res.bankroll;
 
         if (!banca || banca.status !== "ACTIVE") {
-          this.showModal("⚠️ Você precisa criar uma banca antes de salvar bilhetes!", "warning");
+          this.showToast('Voce precisa criar uma banca antes de cadastrar o primeiro bilhete.', 'warning')
+           this.saving = false;
           return;
         }
 
-        // 2️⃣ Se banca existe → salvar normal
         this.salvarBilheteComBanca();
+
       },
       error: () => {
-        this.showModal("❌ Erro ao verificar banca.", "error");
+        this.saving = false;
+         this.showToast('Erro ao validar banca.', 'error');
       }
     });
   }
 
   private salvarBilheteComBanca() {
-    this.saving = true;
 
     this.iaService.salvarBilhete(this.ticket).subscribe({
       next: (res: any) => {
-
         this.saving = false;
 
-        // O backend já salvou e aplicou automaticamente!
-        this.showModal("✅ Bilhete salvo e aplicado na banca!");
+        if (res.alreadyExists) {
+          this.showToast('Este bilhete já foi salvo anteriormente.', 'warning',);
+          return;
+        } 
 
+          this.showToast('Bilhete cadastrado com sucesso!', 'success', );
+        
       },
       error: () => {
         this.saving = false;
-        this.showModal("❌ Erro ao salvar aposta.");
+        this.showToast(
+          'Erro ao salvar o bilhete. Tente novamente.',  'warning',
+        );
       }
     });
   }
 
 
-  showModal(msg: string, icon: "success" | "warning" | "error" = "success") {
-    this.modalMessage = msg;
-    this.modalIcon = icon;
-    this.modalVisible = true;
-    this.cdr.detectChanges();
+  // 2. Método showToast melhorado
+  private showToast(message: string, type: 'success' | 'warning' | 'error') {
+    // Limpar qualquer timeout existente para evitar conflitos
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+    
+    // Se o toast já estiver visível, primeiro esconda-o com uma pequena transição
+    if (this.toastVisible) {
+      this.toastVisible = false;
+      
+      // Aguarde a transição de saída terminar antes de mostrar o novo toast
+      setTimeout(() => {
+        this.showToastWithMessage(message, type);
+      }, 300); // Tempo suficiente para a animação de saída
+    } else {
+      // Se não estiver visível, mostre imediatamente
+      this.showToastWithMessage(message, type);
+    }
   }
 
-  closeModal() {
-    this.modalVisible = false;
+  private showToastWithMessage(message: string, type: 'success' | 'warning' | 'error') {
+      // Defina as propriedades
+    this.toastMessage = message;
+    this.toastType = type;
+
+    // Force a detecção de mudanças antes de tornar o toast visível
     this.cdr.detectChanges();
+    
+    // Use setTimeout em vez de requestAnimationFrame para garantir que o DOM foi atualizado
+    setTimeout(() => {
+      this.toastVisible = true;
+      this.cdr.detectChanges(); // Force a detecção de mudanças novamente
+      
+      // Configure o timeout para esconder o toast
+      this.toastTimeout = setTimeout(() => {
+        this.toastVisible = false;
+        this.cdr.detectChanges(); // Force a detecção de mudanças ao esconder
+      }, 3000);
+    }, 10);
+
   }
 
 }
-

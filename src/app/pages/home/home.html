@@ -50,13 +50,60 @@
           Iniciada: {{ bankroll.createdAt | date:'dd/MM/yyyy HH:mm' }}
         </p>
 
-        <button (click)="processarResultados()" class="btn-processar">
-          Atualizar Banca
-        </button>
+        <div class="bankroll-actions">
+          <button (click)="processarResultados()" class="btn-processar">
+            Atualizar Banca
+          </button>
 
+          <button (click)="abrirCashout()" class="btn-cashout">
+            Encerrar (Cashout)
+          </button>
+        </div>
 
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="cashout-overlay" *ngIf="cashoutAberto">
+  <div class="cashout-modal">
+    <h3>Cashout</h3>
+
+    <p>Informe o valor final que ficou após o cashout</p>
+
+    <input
+      type="number"
+      [(ngModel)]="cashoutValor"
+      placeholder="Ex: 82.50"
+    />
+
+     <div class="modal-actions">
+      <button (click)="fecharCashout()">
+        Cancelar
+      </button>
+      <button (click)="confirmarCashout()">
+        Confirmar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- TOAST FLUTUANTE -->
+<div *ngIf="toastVisible"
+     class="toast-container">
+
+  <div class="toast-box"
+       [ngClass]="toastType">
+    
+    <div class="toast-icon">
+      {{ toastType === 'success' ? '✔' : '⚠' }}
+    </div>
+
+    <div class="toast-message">
+      {{ toastMessage }}
     </div>
 
   </div>
 </div>
+

@@ -67,6 +67,7 @@
                         item.status === 'PENDING' ? '#facc15' : 
                         item.result === 'GREEN' ? '#34d399' :
                         item.result === 'RED' ? '#f87171' : 
+                        item.result === 'CASHOUT' ? '#d1d5db':
                         '#d1d5db'
                     }">
 
@@ -74,6 +75,7 @@
                         item.status === 'PENDING' ? 'Pendente' :
                         item.result === 'GREEN' ? 'Green' :
                         item.result === 'RED' ? 'Red' :
+                        item.result === 'CASHOUT' ? 'Cashout' :
                         'Indefinido'
                     }}
                 </td>
