@@ -20,17 +20,6 @@ export class IaService {
     return this.http.post<SaveResult>(`${this.api}/salvar`, { ticket });
   }
 
-  getHistoricoBilhetes(page: number, size: number, start?: string | null, end?: string | null) {
-    return this.http.get(`${this.api}/historico-bilhetes`, {
-      params: {
-        page,
-        size,
-        start: start ?? '',
-        end: end ?? ''
-      }
-    });
-  }
-
   getJogosFuturos() {
     return this.http.get(`${this.api}/jogos-futuros`);
   }

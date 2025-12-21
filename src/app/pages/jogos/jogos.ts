@@ -212,4 +212,13 @@ loadEncerrados() {
       this.applyFiltroFuturos();
     }
   }
+
+  get totalFuturosFiltrados(): number {
+    return this.allFuturos?.length || 0;
+  }
+
+  get totalEncerradosPagina(): number {
+    return this.encerrados?.length || 0;
+  }
+
 }

@@ -1,7 +1,7 @@
 // src/app/services/bankroll.service.ts
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { map, Observable } from "rxjs";
 
 @Injectable({
   providedIn: "root",
@@ -38,5 +38,26 @@ export class BankrollService {
     });
   }
 
+  getHistoricoBilhetes(
+    page: number,
+    size: number,
+    start?: string,
+    end?: string
+  ): Observable<{ items: any[]; page: number; pages: number }> {
 
+    return this.http.get<any>(`${this.baseUrl}/historico-bilhetes`, {
+      params: {
+        page,
+        size,
+        start: start || '',
+        end: end || ''
+      }
+    }).pipe(
+      map(resp => ({
+        items: resp.items ?? [],
+        page: resp.page ?? 1,
+        pages: resp.pages ?? 0
+      }))
+    );
+  }
 }

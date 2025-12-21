@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { StatisticsService } from '../../services/StatisticsService';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -34,7 +34,9 @@ export class EstatisticasComponent implements OnInit {
   // date sort: 'asc' | 'desc' | null
   dateSort: 'asc' | 'desc' | null = null;
 
-  constructor(private statsService: StatisticsService) {}
+  constructor(private statsService: StatisticsService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.statsService.getAll().subscribe(data => {
@@ -50,6 +52,7 @@ export class EstatisticasComponent implements OnInit {
 
       this.updatePage();
       this.loading = false;
+      this.cdr.detectChanges();
     }, err => {
       console.error('Erro ao carregar estatísticas', err);
       this.loading = false;

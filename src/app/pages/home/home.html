@@ -1,8 +1,6 @@
 
 <div class="dashboard">
 
-  <h1 class="title">Painel Principal</h1>
-  <p class="subtitle">Bem-vindo! Escolha uma das opções abaixo:</p>
   <div class="cards">
 
     <a routerLink="/bilhete" class="card">
@@ -16,51 +14,46 @@
     </a>
 
     <a routerLink="/jogos" class="card">
-      <h2>⚽ Próximos Jogos</h2>
-      <p>Veja os jogos com maior probabilidade.</p>
+      <h2>⚽ Jogos</h2>
+      <p>Veja os proximos jogos disponíveis</p>
     </a>
 
   </div>
 
-  <div>
+  <div class="bankroll-container">
+    <div *ngIf="!bancaExiste" class="bankroll-card create">
+      <h3>Iniciar Banca</h3>
+      <p>Insira o valor inicial para começar a alavancagem.</p>
 
-   <!-- card de criar banca / card de resumo -->
+      <input #valorInicial type="number" placeholder="Ex: 100" [disabled]="creating" />
+      <button [disabled]="creating" (click)="criarBanca(valorInicial.value)">
+        {{ creating ? "Criando..." : "Criar Banca" }}
+      </button>
+    </div>
 
-    <div class="bankroll-container">
-      <div *ngIf="!bancaExiste" class="bankroll-card create">
-        <h3>Iniciar Banca</h3>
-        <p>Insira o valor inicial para começar a alavancagem.</p>
+      <div *ngIf="bancaExiste" class="bankroll-card active">
 
-        <input #valorInicial type="number" placeholder="Ex: 100" [disabled]="creating" />
-        <button [disabled]="creating" (click)="criarBanca(valorInicial.value)">
-          {{ creating ? "Criando..." : "Criar Banca" }}
+      <h3>Resumo Financeiro</h3>
+
+      <div class="saldo-container">
+        <p class="label">Saldo Atual:</p>
+        <p class="valor">R$ {{ bankroll.currentAmount | number:'1.2-2' }}</p>
+      </div>
+
+      <p class="status">
+        Iniciada: {{ bankroll.createdAt | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+
+      <div class="bankroll-actions">
+        <button (click)="processarResultados()" class="btn-processar">
+          Atualizar Banca
+        </button>
+
+        <button (click)="abrirCashout()" class="btn-cashout">
+          Encerrar (Cashout)
         </button>
       </div>
 
-        <div *ngIf="bancaExiste" class="bankroll-card active">
-
-        <h3>Resumo Financeiro</h3>
-
-        <div class="saldo-container">
-          <p class="label">Saldo Atual:</p>
-          <p class="valor">R$ {{ bankroll.currentAmount | number:'1.2-2' }}</p>
-        </div>
-
-        <p class="status">
-          Iniciada: {{ bankroll.createdAt | date:'dd/MM/yyyy HH:mm' }}
-        </p>
-
-        <div class="bankroll-actions">
-          <button (click)="processarResultados()" class="btn-processar">
-            Atualizar Banca
-          </button>
-
-          <button (click)="abrirCashout()" class="btn-cashout">
-            Encerrar (Cashout)
-          </button>
-        </div>
-
-      </div>
     </div>
   </div>
 </div>
