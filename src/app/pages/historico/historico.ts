@@ -32,6 +32,7 @@ export class HistoricoComponent implements OnInit {
   // ===== MODAL =====
   showModal = false;
   selectedItem: any = null;
+  listarTodos = false;
 
   modalLeft = 200;
   modalTop = 100;
@@ -60,7 +61,8 @@ export class HistoricoComponent implements OnInit {
       page,
       this.pageSize,
       this.startDate,
-      this.endDate
+      this.endDate,
+      this.listarTodos
     ).subscribe({
       next: (resp: any) => {
         this.items = (resp.items || []).map((t: any) => ({
@@ -175,4 +177,15 @@ export class HistoricoComponent implements OnInit {
     document.ontouchmove = null;
     document.ontouchend = null;
   }
+
+  listarAtivos(): void {
+    this.listarTodos = false;
+    this.loadHistorico(1);
+  }
+
+  listarTodosBilhetes(): void {
+    this.listarTodos = true;
+    this.loadHistorico(1);
+  }
+
 }

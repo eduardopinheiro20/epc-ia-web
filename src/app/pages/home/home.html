@@ -1,6 +1,25 @@
 
 <div class="dashboard">
 
+
+<!-- TOAST FLUTUANTE -->
+<div *ngIf="toastVisible"
+     class="toast-container">
+
+  <div class="toast-box"
+       [ngClass]="toastType">
+    
+    <div class="toast-icon">
+      {{ toastType === 'success' ? '✔' : '⚠' }}
+    </div>
+
+    <div class="toast-message">
+      {{ toastMessage }}
+    </div>
+
+  </div>
+</div>
+
   <div class="cards">
 
     <a routerLink="/bilhete" class="card">
@@ -77,6 +96,20 @@
       <button (click)="confirmarCashout()">
         Confirmar
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRMAÇÃO CUSTOMIZADA -->
+<div class="cashout-overlay" *ngIf="confirmAberto">
+  <div class="cashout-modal">
+    <h3>Confirmação</h3>
+
+    <p>{{ confirmMessage }}</p>
+
+    <div class="modal-actions">
+      <button (click)="onConfirmCancel()">Cancelar</button>
+      <button (click)="onConfirmAccept()">Confirmar</button>
     </div>
   </div>
 </div>

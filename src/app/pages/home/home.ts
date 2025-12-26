@@ -23,6 +23,10 @@ export class HomeComponent implements OnInit {
   cashoutAberto = false;
   cashoutValor: number | null = null;
   processandoCashout = false;
+  // confirmação customizada (substitui confirm())
+  confirmAberto = false;
+  confirmMessage = '';
+  private confirmPromiseResolve: ((value: boolean) => void) | null = null;
 
   toastVisible = false;
   toastMessage = "";
@@ -71,7 +75,7 @@ export class HomeComponent implements OnInit {
     const initial = Number(valor);
 
     if (isNaN(initial) || initial <= 0) {
-      alert("Informe um valor válido!");
+      this.showToast('Informe um valor válido!', 'warning');
       return;
     }
 
@@ -86,9 +90,9 @@ export class HomeComponent implements OnInit {
         this.creating = false;
 
         if (err.status === 409) {
-          alert("Já existe uma banca ativa!");
+          this.showToast('Já existe uma banca ativa!', 'warning');
         } else {
-          alert("Erro ao criar a banca.");
+          this.showToast('Erro ao criar a banca.', 'warning');
         }
 
         this.cdr.detectChanges();
@@ -98,18 +102,63 @@ export class HomeComponent implements OnInit {
 
   // Processar bilhetes e atualizar saldo da banca
   processarResultados() {
-    if (!confirm("Deseja processar os bilhetes e atualizar sua banca?")) return;
+    // Usamos um modal de confirmação customizado para manter consistência visual
+    this.requestConfirm('Deseja processar os bilhetes e atualizar sua banca?')
+      .then((ok) => {
+        if (!ok) return;
 
-    this.bankrollService.validarAutomatico().subscribe({
-      next: (res) => {
-        alert("Banca atualizada com sucesso!");
-        this.loadBankroll(); // Atualiza card após processar
-      },
-      error: (err) => {
-        console.error(err);
-        alert("Erro ao processar resultados!");
-      }
+        this.bankrollService.validarAutomatico().subscribe({
+          next: (res) => {
+            if (res.noPendingTickets) {
+              this.showToast(
+                'Nenhum bilhete pendente para processar.',
+                'warning'
+              );
+              return;
+            }
+
+            if (res.processados > 0) {
+              this.showToast(
+                'Banca atualizada com sucesso!',
+                'success'
+              );
+              this.loadBankroll();// Atualiza card após processar
+              return;
+            }
+        
+          },
+          error: (err) => {
+            console.error(err);
+            this.showToast('Erro ao processar resultados!', 'error');
+          }
+        });
+      });
+  }
+
+  // Abre o modal de confirmação e retorna uma Promise resolvida pela ação do usuário
+  requestConfirm(message: string): Promise<boolean> {
+    this.confirmMessage = message;
+    this.confirmAberto = true;
+
+    return new Promise(resolve => {
+      this.confirmPromiseResolve = resolve;
     });
+  }
+
+  onConfirmAccept() {
+    this.confirmAberto = false;
+    if (this.confirmPromiseResolve) {
+      this.confirmPromiseResolve(true);
+      this.confirmPromiseResolve = null;
+    }
+  }
+
+  onConfirmCancel() {
+    this.confirmAberto = false;
+    if (this.confirmPromiseResolve) {
+      this.confirmPromiseResolve(false);
+      this.confirmPromiseResolve = null;
+    }
   }
 
   abrirCashout() {

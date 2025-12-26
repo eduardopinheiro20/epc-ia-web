@@ -32,3 +32,40 @@
   width: 15%;
   text-align: right;
 }
+
+.btn-banca {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 15px;
+  background: #00c46b;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-h-completo {
+   margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 15px;
+  background: #00c46b;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-banca:hover {
+  background: #00a85d;
+}
+
+.btn-h-completo:hover {
+  background: #00a85d;
+}
+
+.banca-ativa{
+  display: flex;
+  gap: 12px;
+  justify-content: center; /* Centraliza os botões horizontalmente */
+  margin-top: 15px; /* Espaçamento consistente acima dos botões */
+}

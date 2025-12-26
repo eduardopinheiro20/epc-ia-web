@@ -42,7 +42,8 @@ export class BankrollService {
     page: number,
     size: number,
     start?: string,
-    end?: string
+    end?: string,
+    all: boolean = false
   ): Observable<{ items: any[]; page: number; pages: number }> {
 
     return this.http.get<any>(`${this.baseUrl}/historico-bilhetes`, {
@@ -50,7 +51,8 @@ export class BankrollService {
         page,
         size,
         start: start || '',
-        end: end || ''
+        end: end || '',
+        all
       }
     }).pipe(
       map(resp => ({
