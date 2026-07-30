@@ -1,0 +1,28 @@
+<nav class="navbar">
+
+  <a routerLink="/home" routerLinkActive="active" class="logo cursor-pointer">
+    EPC-IA ⚽
+  </a>
+
+  <div class="menu">
+    <a routerLink="/home" routerLinkActive="active">Início</a>
+    <a routerLink="/historico" routerLinkActive="active">Histórico de Bilhetes</a>
+    <a routerLink="/jogos" routerLinkActive="active">Jogos</a>
+    <a routerLink="/estatisticas" routerLinkActive="active">Estatisticas</a>
+    <a routerLink="/importar" routerLinkActive="active">Importar Dados</a>
+  </div>
+
+ <div *ngIf="auth.isAuthenticated()" class="auth-section">
+    <span class="user-name">
+      {{ auth.getUserName() }}
+    </span>
+
+    <button
+      (click)="logout()"
+      class="logout-btn"
+    >
+      Sair
+    </button>
+  </div>
+
+</nav>

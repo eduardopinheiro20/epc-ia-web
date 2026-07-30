@@ -1,0 +1,81 @@
+.navbar {
+  font-size: 19px;
+  width: 100%;
+  padding: 15px 30px;
+  background: rgba(15, 26, 43, 0.85);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid #0d1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Empurra o conteúdo para as extremidades */
+  top: 0;
+  z-index: 9999;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 40px; /* Mantém o espaço entre logo e menu */
+}
+
+.logo {
+  color: #2ce39b;
+  font-size: 28px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+
+.menu {
+  display: flex;
+  gap: 25px;
+}
+
+.menu a {
+  color: #d5d8df;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: 0.2s;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  color: #2ce39b;
+  transform: translateY(-1px);
+  text-shadow: 0 0 6px rgba(44,227,155,0.6);
+}
+
+.active {
+  color: #2ce39b !important;
+  border-bottom: 2px solid #2ce39b;
+  padding-bottom: 2px;
+  font-weight: 700;
+}
+
+/* Seção de Autenticação à Direita */
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-name {
+  color: #2ce39b; /* Verde padrão solicitado */
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #f87171; /* text-red-400 */
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.logout-btn:hover {
+  color: #ef4444; /* text-red-500 */
+}

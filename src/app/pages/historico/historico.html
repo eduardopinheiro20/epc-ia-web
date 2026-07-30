@@ -1,0 +1,227 @@
+<div class="flex justify-center mt-10">
+  <h1 class="text-3xl font-extrabold text-emerald-400">
+    HISTÓRICO DE BILHETES
+  </h1>
+</div>
+
+<div *ngIf="loading" class="text-center text-gray-400 mt-10">
+  Carregando histórico...
+</div>
+
+<div class="w-full max-w-7xl mx-auto mt-10 px-4" *ngIf="!loading">
+
+    <!-- FILTROS -->
+    <div class="w-full bg-[#0f1a2b] p-4 rounded-xl border border-gray-700">
+
+        <div class="flex flex-wrap gap-4 items-end">
+
+            <div class="flex flex-col">
+                <label class="text-gray-300 text-sm">Data inicial</label>
+                <input type="date" [(ngModel)]="startDate"
+                    class="bg-[#142238] text-gray-200 p-2 rounded" />
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-gray-300 text-sm">Data final</label>
+                <input type="date" [(ngModel)]="endDate"
+                    class="bg-[#142238] text-gray-200 p-2 rounded" />
+            </div>
+
+            <button (click)="filtrar()"
+                class="bg-emerald-500 text-black font-bold px-4 py-2 rounded hover:bg-emerald-400">
+                Filtrar
+            </button>
+
+            <!-- contador de greens (direita) -->
+            <div class="ml-auto flex items-center gap-3">
+              <div class="text-sm text-emerald-400 font-semibold">Greens</div>
+              <div class="text-white font-bold">{{ consecutiveGreens }}</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="banca-ativa">
+      <button
+        (click)="listarAtivos()"
+        [class.bg-emerald-500]="!listarTodos"
+        class="btn-banca"
+      >
+        Banca Ativa
+      </button>
+
+      <button
+        (click)="listarTodosBilhetes()"
+        [class.bg-emerald-500]="listarTodos"
+        class="btn-h-completo"
+      >
+        Histórico Completo
+      </button>
+  </div>
+
+    <!-- TABELA LISTAGEM -->
+    <table class="w-full mt-6 text-gray-300 bg-[#0f1a2b] rounded-xl overflow-hidden shadow-lg">
+        <thead class="bg-[#142238] text-emerald-400">
+            <tr>
+                <th class="py-3 px-4 text-left">Data</th>
+                <th class="py-3 px-4 text-left">Odd Final</th>
+                <th class="py-3 px-4 text-left">%</th>
+                <th class="py-3 px-4 text-left">Status</th>
+                <th class="py-3 px-4 text-center">Visualizar Bilhete</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let item of items" class="border-b border-gray-700">
+                <td class="py-3 px-4">
+                    {{ item.saved_at | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+
+                <td class="py-3 px-4 text-emerald-400 font-semibold">
+                    {{ item.final_odd }}
+                </td>
+
+                <td class="py-3 px-4 text-emerald-400 font-semibold">
+                    {{ item.combined_prob * 100 | number:'1.0-1' }}%
+                </td>
+
+                <td class="py-3 px-4 font-semibold"
+                    [ngStyle]="{
+                      color:
+                        item.status === 'PENDING' ? '#facc15' : 
+                        item.result === 'GREEN' ? '#34d399' :
+                        item.result === 'RED' ? '#f87171' : 
+                        item.result === 'CASHOUT' ? '#d1d5db':
+                        '#d1d5db'
+                    }">
+
+                    {{
+                        item.status === 'PENDING' ? 'Pendente' :
+                        item.result === 'GREEN' ? 'Green' :
+                        item.result === 'RED' ? 'Red' :
+                        item.result === 'CASHOUT' ? 'Cashout' :
+                        'Indefinido'
+                    }}
+                </td>
+
+                <td class="py-3 px-4 text-center">
+                    <button (click)="openModal(item)"
+                        class="text-emerald-300 hover:text-emerald-400 transition text-xl">
+                        👁️
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- PAGINAÇÃO -->
+    <div class="flex justify-center items-center gap-4 mt-6">
+
+        <button
+            (click)="anterior()"
+            [disabled]="page === 1"
+            class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b] 
+                text-emerald-400 font-semibold
+                hover:bg-[#142238] transition disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+            ← Anterior
+        </button>
+
+        <span class="text-gray-300">
+            Página {{ page }} de {{ pages }}
+        </span>
+
+        <button
+            (click)="proxima()"
+            [disabled]="page === pages"
+            class="px-4 py-2 rounded-lg border border-gray-700 bg-[#0f1a2b]
+                text-emerald-400 font-semibold
+                hover:bg-[#142238] transition disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+            Próxima →
+        </button>
+
+        </div>
+
+</div>
+
+<!-- MODAL - Detalhes do Bilhete (flutuante e arrastável) -->
+<div *ngIf="showModal"
+     class="fixed inset-0 bg-black/40 z-[9999] flex items-start justify-center"
+     (click)="closeModal()">
+  <div
+    #modalBox
+    (click)="$event.stopPropagation()"
+    (mousedown)="startDrag($event)"
+    (touchstart)="startTouchDrag($event)"
+    [ngStyle]="{ left: modalLeft + 'px', top: modalTop + 'px', position: 'fixed' }"
+    class="bg-gray-900 p-6 rounded-xl modal-container shadow-xl"
+    style="transform: translate(0,0);"
+    role="dialog"
+    aria-modal="true"
+  >
+
+    <!-- CABEÇALHO ARRASTÁVEL -->
+    <div class="flex items-center justify-between mb-4 select-none" style="touch-action: none;">
+     <h2 class="text-2xl font-bold text-emerald-400 mb-4">
+        Bilhete #{{ selectedItem.id }}
+        <span class="text-gray-400 text-lg ml-2">
+          ({{ selectedItem.selections.length }} seleções)
+        </span>
+      </h2>
+
+
+      <div class="flex items-center gap-2">
+        <button (click)="closeModal()" class="text-gray-400 hover:text-white text-xl">✖</button>
+      </div>
+    </div>
+
+    <!-- Conteúdo do modal -->
+    <div *ngIf="selectedItem">
+      <div class="flex justify-between text-gray-300 mb-4">
+        <span>Data: {{ selectedItem.saved_at | date:'dd/MM/yyyy HH:mm' }}</span>
+        <span class="text-emerald-400 font-semibold">
+          Confiança: {{ selectedItem.combined_prob * 100 | number:'1.0-1' }}%
+        </span>
+      </div>
+
+      <p class="text-emerald-400 font-bold mb-4">
+        Odd Final: {{ selectedItem.final_odd }}
+      </p>
+
+      <hr class="border-gray-700 mb-4">
+
+      <h3 class="text-emerald-300 font-bold text-lg mb-2">Seleções:</h3>
+
+        <table class="w-full text-sm text-gray-300">
+          <thead class="modal-table">
+            <tr class="text-left border-b border-gray-700">
+              <th class="py-2 modal-col-jogo">Jogo</th>
+              <th class="py-2 modal-col-data">Data</th>
+              <th class="py-2 modal-col-mercado">Mercado</th>
+              <th class="py-2 modal-col-odd">Odd</th>
+            </tr>
+          </thead>
+
+        <tbody class="modal-table">
+          <tr *ngFor="let s of selectedItem.selections" class="border-b border-gray-800">
+            <td class="py-2 modal-col-jogo">{{ s.home }} x {{ s.away }}</td>
+
+            <td class="py-2 modal-col-data">
+              {{ s.date | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+
+            <td class="py-2 modal-col-mercado">{{ s.market }}</td>
+
+            <td class="py-2 modal-col-odd text-emerald-400 font-bold">
+              {{ s.odd }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+

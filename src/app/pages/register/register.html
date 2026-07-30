@@ -1,0 +1,72 @@
+<div class="min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-md bg-gray-800 p-6 rounded-xl shadow-lg">
+
+    <h2 class="text-2xl font-bold text-center text-emerald-400 mb-6">
+      Crie sua conta
+    </h2>
+
+    <!-- TOAST FLUTUANTE (padronizado com bilhete) -->
+    <div *ngIf="toastVisible"
+         class="toast-container">
+
+      <div class="toast-box"
+           [ngClass]="toastType">
+        
+        <div class="toast-icon">
+          {{ toastType === 'success' ? '✔' : '⚠' }}
+        </div>
+
+        <div class="toast-message">
+          {{ toastMessage }}
+        </div>
+
+      </div>
+    </div>
+
+    <form (ngSubmit)="register()" class="space-y-4">
+
+      <div>
+        <label class="text-sm text-gray-300">Nome</label>
+        <input [(ngModel)]="name" name="name" required
+          class="w-full mt-1 px-3 py-2 rounded bg-gray-700 text-white" />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-300">Email</label>
+        <input [(ngModel)]="email" name="email" required type="email"
+          class="w-full mt-1 px-3 py-2 rounded bg-gray-700 text-white" />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-300">Senha</label>
+        <input [(ngModel)]="password" name="password" required type="password"
+          class="w-full mt-1 px-3 py-2 rounded bg-gray-700 text-white" />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-300">Confirme a senha</label>
+        <input [(ngModel)]="confirmPassword" name="confirmPassword" required type="password"
+          class="w-full mt-1 px-3 py-2 rounded bg-gray-700 text-white" />
+      </div>
+
+      <!-- Mostra erro local de confirmação de senha -->
+      <div *ngIf="confirmPassword && password !== confirmPassword" class="text-red-400 text-sm text-center">
+        Senhas não coincidem
+      </div>
+
+      <div *ngIf="error" class="text-red-400 text-sm text-center">
+        {{ error }}
+      </div>
+
+      <button [disabled]="loading" class="w-full bg-emerald-500 py-2 rounded font-bold">
+        {{ loading ? 'Criando...' : 'Criar conta' }}
+      </button>
+
+      <p class="text-sm text-gray-400 text-center">
+        Já tem conta?
+        <a routerLink="/login" class="text-emerald-400">Entrar</a>
+      </p>
+
+    </form>
+  </div>
+</div>

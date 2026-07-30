@@ -1,0 +1,218 @@
+/* Estilos CSS para o toast - Posicionado no topo */
+.toast-container {
+  position: fixed;
+  top: 30px; /* Posicionado no topo */
+  right: 30px;
+  z-index: 9999;
+  pointer-events: none; /* Permite clicar através do container */
+}
+
+.toast-box {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  margin-bottom: 10px;
+  min-width: 280px;
+  max-width: 400px;
+  animation: toast-in 0.3s ease-out forwards, toast-out 0.3s ease-in forwards 2.7s;
+  pointer-events: auto; /* Restaura interatividade para o toast */
+}
+
+.toast-icon {
+  margin-right: 12px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.toast-message {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Estilos para diferentes tipos de toast */
+.success {
+  background-color: rgba(0, 200, 83, 0.95);
+  color: white;
+}
+
+.warning {
+  background-color: rgba(250, 184, 4, 0.95);
+  color: white;
+}
+
+.error {
+  background-color: rgba(244, 67, 54, 0.95);
+  color: white;
+}
+
+/* Animações ajustadas para vir do topo */
+@keyframes toast-in {
+  from {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+}
+
+.odds-panel {
+  max-width: 880px;
+  margin: 40px auto;
+  padding: 28px;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 34%),
+    #111827;
+  border: 1px solid #374151;
+  border-radius: 18px;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.3);
+}
+
+.odds-panel__header h1 {
+  margin: 3px 0 8px;
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.odds-panel__header p {
+  color: #9ca3af;
+}
+
+.odds-panel__eyebrow {
+  color: #34d399 !important;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.odds-panel__notice {
+  margin: 22px 0 16px;
+  padding: 13px 15px;
+  color: #d1fae5;
+  background: rgba(6, 78, 59, 0.34);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.odds-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.odd-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 12px;
+}
+
+.odd-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.odd-card__content strong {
+  font-size: 1rem;
+}
+
+.odd-card__content span,
+.odd-card__content small {
+  color: #9ca3af;
+}
+
+.odd-card__group {
+  color: #6ee7b7 !important;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.odd-input {
+  flex: 0 0 118px;
+}
+
+.odd-input span {
+  display: block;
+  margin-bottom: 5px;
+  color: #9ca3af;
+  font-size: 0.74rem;
+}
+
+.odd-input input {
+  width: 100%;
+  padding: 10px 11px;
+  color: #f8fafc;
+  background: #111827;
+  border: 1px solid #4b5563;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.odd-input input:focus {
+  outline: 2px solid #10b981;
+  outline-offset: 1px;
+}
+
+.odds-panel__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.odds-panel__actions button {
+  padding: 12px 18px;
+  color: #052e24;
+  background: #34d399;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.odds-panel__actions button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+@media (max-width: 680px) {
+  .odds-panel {
+    margin: 20px 12px;
+    padding: 20px;
+  }
+
+  .odd-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .odd-input {
+    flex-basis: auto;
+  }
+}

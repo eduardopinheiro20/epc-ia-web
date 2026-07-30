@@ -1,0 +1,71 @@
+/* --------- TAMANHO DO MODAL --------- */
+.modal-container {
+  width: 800px;         /* antes ~600px */
+  max-width: 90vw;      
+  padding: 30px;
+}
+
+/* tabela mais larga e uniforme */
+.modal-table th,
+.modal-table td {
+  padding: 12px 18px !important;
+  font-size: 15px;
+}
+
+/* deixar a coluna JOGO mais larga */
+.modal-col-jogo {
+  width: 35%;
+}
+
+/* deixar a coluna DATA mais larga */
+.modal-col-data {
+  width: 25%;
+}
+
+/* Mercado */
+.modal-col-mercado {
+  width: 25%;
+}
+
+/* Odd */
+.modal-col-odd {
+  width: 15%;
+  text-align: right;
+}
+
+.btn-banca {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 15px;
+  background: #00c46b;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-h-completo {
+   margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 15px;
+  background: #00c46b;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-banca:hover {
+  background: #00a85d;
+}
+
+.btn-h-completo:hover {
+  background: #00a85d;
+}
+
+.banca-ativa{
+  display: flex;
+  gap: 12px;
+  justify-content: center; /* Centraliza os botões horizontalmente */
+  margin-top: 15px; /* Espaçamento consistente acima dos botões */
+}

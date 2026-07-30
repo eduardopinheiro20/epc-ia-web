@@ -1,0 +1,201 @@
+<main class="import-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Base de dados</p>
+      <h1>Importar planilha de jogos</h1>
+      <p class="subtitle">
+        Valide os jogos, resultados, estatísticas e fontes antes de salvar no PostgreSQL.
+      </p>
+    </div>
+
+    <button class="secondary-button" type="button" (click)="downloadModel()" [disabled]="downloading">
+      {{ downloading ? 'Baixando…' : 'Baixar modelo XLSX' }}
+    </button>
+  </header>
+
+  <section class="workflow">
+    <article class="step-card active">
+      <span>1</span>
+      <div>
+        <strong>Selecionar</strong>
+        <small>Arquivo .xlsx</small>
+      </div>
+    </article>
+    <article class="step-card" [class.active]="preview">
+      <span>2</span>
+      <div>
+        <strong>Validar</strong>
+        <small>Conferir dados</small>
+      </div>
+    </article>
+    <article class="step-card" [class.active]="preview?.imported">
+      <span>3</span>
+      <div>
+        <strong>Importar</strong>
+        <small>Salvar no banco</small>
+      </div>
+    </article>
+  </section>
+
+  <section
+    class="drop-zone"
+    [class.dragging]="dragging"
+    [class.has-file]="selectedFile"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div class="upload-icon">XLSX</div>
+
+    <ng-container *ngIf="!selectedFile; else selectedFileBlock">
+      <h2>Arraste a planilha aqui</h2>
+      <p>ou escolha o arquivo preenchido no computador</p>
+      <label class="primary-button file-button">
+        Selecionar arquivo
+        <input type="file" accept=".xlsx" (change)="onFileSelected($event)" />
+      </label>
+      <small>Máximo de 10 MB</small>
+    </ng-container>
+
+    <ng-template #selectedFileBlock>
+      <h2>{{ selectedFile?.name }}</h2>
+      <p>{{ fileSize(selectedFile?.size || 0) }}</p>
+      <div class="button-row">
+        <button class="primary-button" type="button" (click)="validate()" [disabled]="validating || importing">
+          {{ validating ? 'Validando…' : 'Validar planilha' }}
+        </button>
+        <button class="ghost-button" type="button" (click)="reset()" [disabled]="validating || importing">
+          Trocar arquivo
+        </button>
+      </div>
+    </ng-template>
+  </section>
+
+  <div *ngIf="errorMessage" class="message error-message">
+    {{ errorMessage }}
+  </div>
+
+  <ng-container *ngIf="preview as result">
+    <section *ngIf="result.imported" class="message success-message">
+      <div>
+        <strong>Importação concluída</strong>
+        <span>Os dados foram gravados e as médias dos últimos 10 jogos foram recalculadas.</span>
+      </div>
+    </section>
+
+    <section class="summary-grid">
+      <article>
+        <span>Partidas lidas</span>
+        <strong>{{ result.fixturesRead }}</strong>
+      </article>
+      <article>
+        <span>Estatísticas lidas</span>
+        <strong>{{ result.statisticsRead }}</strong>
+      </article>
+      <article>
+        <span>Fontes lidas</span>
+        <strong>{{ result.sourcesRead }}</strong>
+      </article>
+      <article [class.bad]="errorsCount > 0">
+        <span>Erros</span>
+        <strong>{{ errorsCount }}</strong>
+      </article>
+      <article [class.warning]="warningsCount > 0">
+        <span>Avisos</span>
+        <strong>{{ warningsCount }}</strong>
+      </article>
+    </section>
+
+    <section *ngIf="result.imported" class="import-result-grid">
+      <article><strong>{{ result.fixturesInserted }}</strong><span>partidas inseridas</span></article>
+      <article><strong>{{ result.fixturesUpdated }}</strong><span>partidas atualizadas</span></article>
+      <article><strong>{{ result.teamsInserted }}</strong><span>times novos</span></article>
+      <article><strong>{{ result.leaguesInserted }}</strong><span>ligas novas</span></article>
+      <article><strong>{{ result.statisticsUpserted }}</strong><span>estatísticas salvas</span></article>
+      <article><strong>{{ result.sourcesInserted }}</strong><span>fontes registradas</span></article>
+    </section>
+
+    <section *ngIf="result.issues.length" class="panel">
+      <div class="panel-title">
+        <div>
+          <p class="eyebrow">Validação</p>
+          <h2>Erros e avisos</h2>
+        </div>
+      </div>
+      <div class="issues-list">
+        <article *ngFor="let issue of result.issues" [class.issue-error]="issue.severity === 'ERROR'">
+          <span class="issue-badge">{{ issue.severity === 'ERROR' ? 'Erro' : 'Aviso' }}</span>
+          <div>
+            <strong>
+              {{ issue.sheet || 'Arquivo' }}
+              <ng-container *ngIf="issue.row"> · linha {{ issue.row }}</ng-container>
+              <ng-container *ngIf="issue.field"> · {{ issue.field }}</ng-container>
+            </strong>
+            <p>{{ issue.message }}</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <div>
+          <p class="eyebrow">Pré-visualização</p>
+          <h2>Partidas encontradas</h2>
+        </div>
+        <span class="valid-pill" [class.invalid]="!result.valid">
+          {{ result.valid ? 'Planilha válida' : 'Correção necessária' }}
+        </span>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Ação</th>
+              <th>Confronto</th>
+              <th>Liga</th>
+              <th>Data</th>
+              <th>Status</th>
+              <th>Placar</th>
+              <th>Stats</th>
+              <th>Fontes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fixture of result.fixtures">
+              <td>
+                <span class="action-pill" [class.update]="fixture.action === 'ATUALIZAR'">
+                  {{ fixture.action === 'ATUALIZAR' ? 'Atualizar' : 'Inserir' }}
+                </span>
+              </td>
+              <td class="match-cell">{{ fixture.homeTeamName }} × {{ fixture.awayTeamName }}</td>
+              <td>{{ fixture.leagueName }} · {{ fixture.leagueCountry }}</td>
+              <td>{{ fixture.kickoffAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ fixture.status }}</td>
+              <td>{{ score(fixture) }}</td>
+              <td>
+                {{ fixture.homeStatistics && fixture.awayStatistics ? '2 times' :
+                   (fixture.homeStatistics || fixture.awayStatistics ? '1 time' : '—') }}
+              </td>
+              <td>{{ fixture.sourceCount }}</td>
+            </tr>
+            <tr *ngIf="!result.fixtures.length">
+              <td colspan="8" class="empty-row">Nenhuma partida preenchida.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section *ngIf="result.valid && !result.imported" class="confirmation-bar">
+      <div>
+        <strong>Revise a prévia antes de confirmar.</strong>
+        <span>A operação será feita em uma única transação.</span>
+      </div>
+      <button class="primary-button" type="button" (click)="confirmImport()" [disabled]="importing">
+        {{ importing ? 'Importando…' : 'Confirmar importação' }}
+      </button>
+    </section>
+  </ng-container>
+</main>
